@@ -3,23 +3,14 @@ MINI-DOS for PC-8001/8801/Sharp X1 source and d88 bootable image
 
 # Directory Structure
 ├─bootableImages (ブートディスクイメージ)
-
 │  ├─PC-8001_8801 (PC-8001/PC-8801シリーズ用※1)
-
 │  └─X1 (Sharp X1/X1Turo用)
-
 ├─doc (ドキュメントPDF)
-
 ├─src (ソースコード)
-
 │  ├─PC-8001_8801 (PC-8001/PC-8801シリーズ用)
-
 │  │  └─Version 0.B
-
 │  └─X1 (Sharp X1/X1Turo用)
-
 │      └─Version 0.C
-
 └─util (任意のファイル群のコントロールZ以降を除去するC#のコマンドラインツールのソース)
 
 # 説明
@@ -35,10 +26,6 @@ MINI-DOS for PC-8001/8801/Sharp X1 source and d88 bootable image
 　SOCEはスクリーンエディタです。アセンブラソースの自動フォーマット機能を持ちます。
 
 　MINI-DOSは、NEC Disk BASIC互換のフロッピーディスクを扱うDOSです。mount/removeは不要です。CP/Mのようなリブートも不要です。BASICと同等のスクリーンエディタが使用できます。
-
-PC-8001/8801およびX1用のDOSです。基本的にPC-8801で使用すべきもので、X1は
-
-
 
 # PC-8001/8801版の制限事項
 PC-8001mkII/mkIISR, PC-8801/mkII/mkIISR以降をサポートします
