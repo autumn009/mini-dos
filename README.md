@@ -21,10 +21,10 @@ MINI-DOSは、ENIX等が発売したいくつかのゲームの開発及びゲームのブートに使用された
 ├─src (ソースコード)
 │  ├─PC-8001_8801 (PC-8001/PC-8801シリーズ用)
 │  │  ├─AZA Aki's Zilog mnemonic Asembler (アセンブラAZAのソースコード)
-│  │  ├─MINI-DOS Version 0.B
-│  │  └─SOCE Screen Oriented Character Editor
+│  │  ├─MINI-DOS Version 0.B (MINI-DOS 80/88のソースコード)
+│  │  └─SOCE Screen Oriented Character Editor (エディタSOCEのソースコード)
 │  └─X1 (Sharp X1/X1Turo用)
-│      └─MINI-DOS Version 0.C
+│      └─MINI-DOS Version 0.C (MINI-DOS X1のソースコード)
 └─util
     └─ControlZCleaner (任意のファイル群のコントロールZ以降を除去するC#のコマンドラインツールのソース)
 ```
