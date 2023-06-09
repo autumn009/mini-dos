@@ -29,6 +29,8 @@ MINI-DOS for PC-8001/8801/Sharp X1 source and d88 bootable image
 
 　MINI-DOSは、NEC Disk BASIC互換のフロッピーディスクを扱うDOSです。mount/removeは不要です。CP/Mのようなリブートも不要です。BASICと同等のスクリーンエディタが使用できます。
 
+　詳細はドキュメントPDFをお読みください。
+
 # PC-8001/8801版の制限事項
 PC-8001mkII/mkIISR, PC-8801/mkII/mkIISR以降をサポートします
 
