@@ -1,0 +1,375 @@
+;R4
+;" AZA assembler Ver1.3x external module
+;"  This file is included by 'ac4'
+;
+EXTMNM:
+	CP	21+1
+	JP	NC,ILLMNM
+	SUB	10
+	JP	C,ILLMNM
+	LD	L,A
+	LD	H,0
+	ADD	HL,HL
+	LD	DE,EMTBL
+	ADD	HL,DE
+	LD	E,(HL)
+	INC	HL
+	LD	D,(HL)
+	EX	DE,HL
+	JP	(HL)
+;
+EMTBL:	DEFW	ILLMNM		;MSKIP
+	DEFW	ILLMNM		;MNEXT
+	DEFW	MLOOP
+	DEFW	MLEND
+	DEFW	ILLMNM		;MWHILE
+	DEFW	ILLMNM		;MCOND
+	DEFW	ILLMNM		;MWEND
+	DEFW	MREPEAT
+	DEFW	MUNTIL
+	DEFW	MKEEP
+	DEFW	MKEEPOUT
+	DEFW	ILLMNM		;MCALC
+;
+GETCOND:
+	CALL	ANAOP
+; LD (NUM1),DE
+; LD (TBL1),HL
+GCN100:	LD	A,(HL)
+	INC	HL
+	INC	HL
+	CP	255
+	JP	Z,ILLOPR
+	CP	4
+	JR	NZ,GCN100
+	DEC	HL
+	LD	A,(HL)
+	OR	%11000010
+	RET
+;
+	IF	0
+.XLIST
+MSKIP:  CALL    GETCOND
+	LD	DE,OBJLINBUF
+	LD	C,0
+	CALL	MDPUT
+	LD	HL,(BUFREF)
+	INC	HL
+	CALL	STKPUSH
+	LD	A,(HL)
+	INC	HL
+	CALL	MDPUT
+	LD	A,(HL)
+	CALL	MDPUT
+	LD	HL,10+128
+	CALL	STKPUSH
+	JP	MDB300
+;
+MNEXT:
+	CALL	STKPOP
+	LD	A,L
+	CALL	STKPOP
+	CP	10+128
+	JP	NZ,STKMIS
+	LD	DE,(REFER)
+	LD	(HL),E
+	INC	HL
+	LD	(HL),D
+	JP	ALNEEN
+.LIST
+        ENDIF
+;
+MLOOP:	CALL	ANAOP
+	LD	(NUM1),DE
+	LD	(TBL1),HL
+MLP10:	LD	A,(HL)
+	INC	HL
+	INC	HL
+	OR	A
+	JR	Z,MLP200
+	CP	255
+	JP	Z,ILLOPR
+	CP	2
+	JR	NZ,MLP10
+MLP200:	DEC	HL
+	LD	H,(HL)
+	LD	L,A
+	CALL	STKPUSH
+	LD	DE,%1000110000
+	OR	A
+	SBC	HL,DE
+	JP	Z,ILLOPR
+	CALL	SSKIP
+	CP	","
+	JP	NZ,MLP800
+	LD	HL,KWLD+1
+	LD	(WKEEP),HL
+	CALL	ALNLLL
+MLSUB:	LD	HL,(REFER)
+	CALL	STKPUSH
+	LD	HL,12+128
+	JP	STKPUSH
+;
+MLP800:	CALL	MLSUB
+	JP	ALNEEN
+;
+MLEND:	LD	DE,OBJLINBUF
+	LD	C,0
+	CALL	STKPOP
+	LD	A,L
+	CP	12+128
+	JP	NZ,STKMIS
+	CALL	STKPOP
+	PUSH	HL
+	CALL	STKPOP
+	LD	A,L
+	LD	(MLEWK),A
+	OR	A
+	JR	Z,MLE8
+	PUSH	HL
+	CALL	SSKIP
+	CALL	UPPER
+	CP	"A"
+	JP	NZ,ILLOPR
+	INC	IY
+	POP	HL
+	LD	A,H
+	OR	%00001011	;"DEC ss
+	CALL	MDPUT
+	LD	A,H
+	SRL	A
+	SRL	A
+	SRL	A
+	PUSH	AF
+	OR	%01111000
+	CALL	MDPUT
+	POP	AF
+	OR	%10110001
+	CALL	MDPUT
+	CALL	MDB300
+	LD	DE,OBJLINBUF
+	LD	C,0
+MLECOM:	POP	HL
+	PUSH	DE
+	EX	DE,HL
+	LD	HL,(REFER)
+	INC	HL
+	INC	HL
+	LD	A,(MLEWK)
+	OR	A
+	JR	NZ,MLEC10
+	INC	HL
+MLEC10:	EX	DE,HL
+	PUSH	HL
+	OR	A
+	SBC	HL,DE
+	POP	DE
+	LD	A,H
+	CP	255
+	JR	NZ,MLEJP
+	LD	A,L
+	CP	$80
+	JR	C,MLEJP
+	LD	A,$20
+MLECOM2:
+	POP	DE
+	CALL	MDPUT
+	LD	A,L
+	CALL	MDPUT
+	JP	MDB300
+;
+MLEJP0:	
+	LD	A,(DEC_CODE)
+	EX	DE,HL
+	POP	DE
+	CALL	MDPUT
+	PUSH	DE
+	EX	DE,HL
+;
+MLEJP:	EX	DE,HL
+	POP	DE
+	LD	A,$C2
+	CALL	MDPUT
+	LD	A,L
+	CALL	MDPUT
+	LD	A,H
+	CALL	MDPUT
+	JP	MDB300
+;
+MLE8:	LD	A,H
+	OR	%00000101
+	LD	(DEC_CODE),A
+	CP	$05
+	JR	Z,MLEDJNZ
+	CALL	MDPUT
+	JR	MLECOM
+;
+MLEDJNZ:
+	POP	HL
+	PUSH	DE
+	EX	DE,HL
+	LD	HL,(REFER)
+	INC	HL
+	INC	HL
+	EX	DE,HL
+	PUSH	HL
+	OR	A
+	SBC	HL,DE
+	POP	DE
+	LD	A,H
+	CP	255
+	JR	NZ,MLEJP0
+	LD	A,L
+	CP	$80
+	JR	C,MLEJP0
+	LD	A,$10
+	JR	MLECOM2
+;
+DEC_CODE:	
+	DB	0
+;
+	IF	0
+.XLIST
+MWHILE: LD      HL,(REFER)
+	CALL	STKPUSH
+	LD	HL,14+128
+	CALL	STKPUSH
+	JP	ALNEEN
+;
+MCOND:	CALL	STKPOP
+	LD	A,L
+	CP	14+128
+	JP	NZ,STKMIS
+	CALL	GETCOND
+	XOR	%00001000
+	LD	DE,OBJLINBUF
+	LD	C,0
+	CALL	MDPUT
+	LD	HL,(BUFREF)
+	LD	A,(HL)
+	INC	HL
+	CALL	MDPUT
+	LD	A,(HL)
+	DEC	HL
+	CALL	MDPUT
+	CALL	STKPUSH
+	LD	HL,15+128
+	CALL	STKPUSH
+	JP	MDB300
+MWEND:	CALL	STKPOP
+	LD	A,L
+	CP	15+128
+	JR	Z,MWEND10
+	CP	14+128
+	JP	NZ,STKMIS
+MWENDSS:	CALL	STKPOP
+	LD	DE,OBJLINBUF
+	LD	C,0
+	LD	A,$C3
+	CALL	MDPUT
+	LD	A,L
+	CALL	MDPUT
+	LD	A,H
+	CALL	MDPUT
+	CALL	MDB300
+	RET
+MWEND10:
+	CALL	STKPOP
+	PUSH	HL
+	CALL	MWENDSS
+	LD	DE,(REFER)
+	POP	HL
+	LD	(HL),E
+	INC	HL
+	LD	(HL),D
+	RET	
+.LIST
+	ENDIF
+;
+MREPEAT:
+	LD	HL,(REFER)
+	CALL	STKPUSH
+	LD	HL,17+128
+	CALL	STKPUSH
+	JP	ALNEEN
+;
+MUNTIL:
+	CALL	STKPOP
+	LD	A,L
+	CALL	STKPOP
+	PUSH	HL
+	CP	17+128
+	JP	NZ,STKMIS
+	CALL	GETCOND
+	XOR	%00001000
+	LD	DE,OBJLINBUF
+	LD	C,0
+	CALL	MDPUT
+	POP	HL
+	LD	A,L
+	CALL	MDPUT
+	LD	A,H
+	CALL	MDPUT
+	JP	MDB300
+;
+MKEEP:	LD	BC,0
+	LD	DE,OBJLINBUF
+MKP10:	PUSH	DE
+	PUSH	BC
+	CALL	ANAOP
+	POP	BC
+	POP	DE
+MKP20:	LD	A,(HL)
+	INC	HL
+	INC	HL
+	CP	11
+	JR	Z,MKP120
+	CP	3
+	JR	NZ,MKP20
+	DEC	HL
+	LD	A,(HL)
+	LD	H,0
+	LD	L,A
+	CALL	STKPUSH
+	JR	MKP400
+MKP120:	LD	A,(PREBYT)
+	LD	H,A
+	LD	L,%00100000
+	CALL	STKPUSH
+	CALL	MDPUT
+	LD	A,L
+MKP400:	INC	B
+	OR	%11000101
+	CALL	MDPUT
+	CALL	SSKIP
+	INC	IY
+	CP	","
+	JR	Z,MKP10
+	LD	L,B
+	CALL	STKPUSH
+	LD	HL,19+128
+	CALL	STKPUSH
+	JP	MDB300
+;
+MKEEPOUT:
+	CALL	STKPOP
+	LD	A,L
+	CP	19+128
+	JP	NZ,STKMIS
+	CALL	STKPOP
+	LD	B,L
+	LD	C,0
+	LD	DE,OBJLINBUF
+MKO10:	CALL	STKPOP
+	LD	A,H
+	OR	A
+	JR	Z,MKO20
+	CALL	MDPUT
+MKO20:	LD	A,L
+	OR	%11000001
+	CALL	MDPUT
+	DJNZ	MKO10
+	JP	MDB300
+;
+;
+ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ
