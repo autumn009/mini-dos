@@ -2,7 +2,7 @@
 MINI-DOS for PC-8001/8801/Sharp X1 source and d88 bootable image
 
 # Directory Structure
-'''
+```
 ├─bootableImages (ブートディスクイメージ)  
 │  ├─PC-8001_8801 (PC-8001/PC-8801シリーズ用)  
 │  └─X1 (Sharp X1/X1Turo用)  
@@ -13,7 +13,7 @@ MINI-DOS for PC-8001/8801/Sharp X1 source and d88 bootable image
 │  └─X1 (Sharp X1/X1Turo用)  
 │      └─Version 0.C  
 └─util (任意のファイル群のコントロールZ以降を除去するC#のコマンドラインツールのソース)
-'''
+```
 
 # 説明
 
