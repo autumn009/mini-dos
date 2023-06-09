@@ -1,0 +1,13 @@
+
+
+
+aza86.exe :
+
+aza86.c : aza86.y
+	yacc aza86.y
+
+install :
+	copy aza86.exe i:\bin
+	copy aza86.inc i:\lib
+
+
