@@ -1,0 +1,11 @@
+ ORG $100
+ TITLE test.trc
+ INCLUDE dosequ
+ SRV CPRNXT
+ DEFB $D,$A,"TYPE ANY KEY",$D,$A,$A,0
+LLL:SRV CINSCN
+ CP "!"
+ JP Z,0
+ ROMCALL $257
+ JR LLL
+ END

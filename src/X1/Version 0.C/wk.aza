@@ -1,0 +1,4 @@
+	LD	A,$17
+	CALL	TRCMD
+	LD	A,$0F
+	CALL	TR1B

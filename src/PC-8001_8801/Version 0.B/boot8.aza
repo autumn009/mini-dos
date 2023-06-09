@@ -1,0 +1,122 @@
+;R8
+;"boot for MINI-DOS Ver0.95 Rev 14
+;"  Ver 0.9A
+;
+	TITLE	boot.sys
+;
+DOSTOP EQU $C100
+;DOSTOP EQU $81
+;                                                  
+;
+ ORG $C000
+;
+;
+VERS EQU $1850
+START:
+ LD A,($99)
+ CP $C5                                                  
+ JR Z,START2
+ LD A,4+32
+ OUT ($31),A
+	RST	0
+START2:
+ XOR A
+ OUT (81),A
+; LD HL,TRNCODE
+; LD DE,TRNTO
+; LD BC,ZZZZZZ-TRNCODE
+; LDIR
+; JP TRNTO
+TRNCODE:
+;.PHASE TRNTO
+ LD ($EDC6),A
+ LD ($EDC5),A
+ DEC A
+ LD ($EDC9),A
+;
+ LD A,$17
+ CALL $17C
+ LD A,$0F
+ CALL $183
+;
+RETRY0:
+ LD B,0 ;LOAD wrkimg.img
+ LD C,2
+ LD DE,$D000-4
+ LD A,15
+ OR A
+ CALL $99
+ JR C,RETRY0
+ LD HL,$D000
+ LD DE,$E900
+ LD BC,15*256
+ LDIR
+;
+RETRY2:LD B,1*2
+ LD C,1
+ LD DE,$C100-4
+ LD A,16
+ OR A
+ CALL $99
+ JR C,RETRY2
+;
+RETRY:LD B,2*2
+ LD C,1
+ LD DE,$D100-4
+ LD A,16
+ OR A
+ CALL $99
+ JR C,RETRY
+;
+;
+ LD SP,$FFF0
+ LD A,12
+ CALL $257
+ LD B,80
+ LD C,25
+ CALL $93A
+ LD B,80
+ LD C,25
+ CALL $93A
+ LD HL,TITMES
+ CALL PRSTR
+ LD A,(VERS)
+	LD	HL,MULTICARD
+        CP      "1"
+	JR	Z,PCCOM
+ LD HL,PC88P
+ CP "2"
+ JR Z,PCCOM
+ CP "4"
+ JR Z,PCCOM
+ LD HL,PC80P
+ CP "3"
+ JR Z,PCCOM
+ LD A,$FF  ;IF KOM-980 THEN ENABLES WRITE PROTECT
+ OUT ($79),A
+ JR JPDOS
+PCCOM:LD DE,DOSTOP+6 ;TRANSFER BANK PORT INFORMATION
+ LD BC,3
+ LDIR
+ CALL PRSTR
+JPDOS:JP DOSTOP
+;
+PRSTR:
+LBL:LD A,(HL)
+ INC HL
+ CALL $257
+ OR A
+ JR NZ,LBL
+ RET
+;
+PC88P:DEFB 4+32,6+32,$31,"88",0
+PC80P:DEFB 0,0,0,"80mk2",0
+MULTICARD:	DEFB	254,255,$E2,"MC",0
+;
+TITMES:	DEFB	"MINI-DOS Ver 0.9A",$D,$A
+       DEFB "Copyright 1984 (c) by Akira Kita",$D,$A
+       DEFB 0
+;
+;.DEPHASE
+;                                                              
+ZZZZZZ:END START

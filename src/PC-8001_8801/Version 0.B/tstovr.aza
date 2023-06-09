@@ -1,0 +1,8 @@
+ ORG $E000
+ TITLE 2:tstovr.ovr
+ INCLUDE dosequ
+ SRV CPRSTR
+ SRV CPRCRLF
+ SRV WARM
+;
+ZZZZZZ:END

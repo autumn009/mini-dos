@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ControlZCleaner": {
+      "commandName": "Project",
+      "commandLineArgs": "c:\\delme *.aza"
+    }
+  }
+}

@@ -1,0 +1,40 @@
+TSTHEX:	CALL	TST09
+	RET	NC
+	CALL	TSTAF
+	RET
+;
+TST09:	CP	"0"
+	RET	C
+	CP	"9"+1
+	CCF
+	RET
+;
+TSTAF:	CP	"A"
+	RET	C
+	CP	"F"+1
+	CCF
+	RET
+;
+;
+GENHEX:	AND	$F
+	ADD	A,"0"
+	CP	"9"+1
+	RET	C
+	ADD	A,"A"-"0"-10
+	RET
+;
+UPPER:	CP	"a"
+	RET	C
+	CP	"z"+1
+	RET	NC
+	SUB	$20
+	RET
+;
+SEX:	PUSH	AF
+	LD	A,L
+	RLA
+	SBC	A,A
+	LD	H,A
+	POP	AF
+	RET
+;

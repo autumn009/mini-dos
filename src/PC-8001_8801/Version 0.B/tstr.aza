@@ -1,0 +1,70 @@
+;
+SIZE	EQU	4
+;
+        ORG     $100
+	INCLUDE	dosequ
+        TITLE   2:tst.trc
+;
+	LD	IX,FCB
+	SRV	MAKFCB
+;
+RRR:	LD	A,(HL+)
+	CP	" "
+	JR	Z,RRR
+	CP	"w"
+	JP	Z,WRT
+	XOR	A
+WRT:	LD	(RWFLG),A
+;
+	SRV	CPRNXT
+	DEFB	"ENTER PAGE NUMBER(0-9):",0
+	SRV	CINCHR
+	SUB	$30
+	CP	10
+	JR	NC,ERR
+	PUSH	AF
+        LD      HL,$F300
+        LD      B,SIZE
+	LD	A,2
+	SRV	OPEN
+	JP	C,ERR
+        LD      HL,$F300-4
+        LD      B,$FF00-$F300/256/SIZE
+	POP	AF
+	LD	C,A
+	ADD	A,A
+	ADD	A,C
+        LD      C,A
+LLLL:	SRV	SETBUF
+	KEEP	HL
+	LD	L,C
+	LD	H,0
+	SRV	RESTORE
+	PUSH	AF
+        LD      A,(RWFLG)
+	OR	A
+	JR	Z,LLL10
+	POP	AF
+        SRV     PUTBLK
+	JR	LLL20
+LLL10:	POP	AF
+	JP	C,NOTERR
+        SRV     GETBLK
+LLL20:	KEEPOUT
+        LD      DE,256*SIZE
+	ADD	HL,DE
+	INC	C
+        DJNZ    LLLL
+	SRV	CLOSE
+;
+	SRV	WARM
+;
+NOTERR:	SRV	CPRNXT
+	DEFB	$D,$A,"DATA WAS NOT EXIST!",0
+ERR:    SRV     WARM
+;
+;
+FCB:	DEFS	36
+RWFLG:DEFS 1
+ZZZZZZ:                                                
+	END
