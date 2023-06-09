@@ -1,5 +1,15 @@
-# mini-dos
+# AZAS (MINI-DOS)について
 MINI-DOS for PC-8001/8801/Sharp X1 source and d88 bootable image
+
+MINI-DOSは、ENIX等が発売したいくつかのゲームの開発及びゲームのブートに使用されたDOSです。開発システム全体をAZASと呼びます。ここでは、テスト版を除く最終段階のソースコード及びブート可能なD88フォーマットのイメージを提供します。PC-8801/X1のエミュレータがあれば起動します。
+
+# 実績
+-東京NAMPAストリート 88版/X1版(ENIX)の開発及びブート
+-ブレインブレーカー(ENIX)のブート
+-HANG-ON 88SR版(パックスエレクトロニカ)の開発及びブート
+-等
+
+※ 全てDISK版。カセット版はDOSを使用していない
 
 # Directory Structure
 ```
